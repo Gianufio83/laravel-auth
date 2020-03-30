@@ -88,9 +88,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($slug)
     {
-        $post = Post::where('slug', $slug)->first();
+        $post = Post::where('slug',$slug)->first();
 
         return view('admin.posts.edit', compact('post'));
     }
@@ -102,9 +102,29 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $idUser = Auth::user()->id;
+        if (empty($post)) {
+            abort(404);
+        }
+        if ($post->user->id != $idUser) {
+            abort(404);
+        }
+        $request->validate($this->validateRules);
+        $data = $request->all();
+       
+        $post->title = $data['title'];
+        $post->body = $data['body'];
+        
+        $post->slug = Str::finish(Str::slug($post->title), rand(1, 1000000));
+        $post->updated_at = Carbon::now();
+        $updated = $post->update();
+
+        if (!$updated) {
+            return redirect()->back();
+        }
+        return redirect()->route('admin.posts.show', $post->slug);
     }
 
     /**
