@@ -15,10 +15,10 @@
         <div class="card-body">
           <h5 class="card-title">{{$post->title}}</h5>
           <p class="card-text">{{ $post->body }}</p>
-          <p class="card-text">This post was write from: {{ $post->user->name }}</p>
+          <p class="card-text">This post was write from: {{$post->user->name }}</p>
           <a href="#" class="btn btn-primary m-3">Add Comment</a>
-          <a class="btn btn-success m-3" href="">View all details</a>
-          <a class="btn btn-warning m-3" href="">Edit post</a>
+        <a class="btn btn-success m-3" href="{{route('admin.posts.show', $post->slug)}}">View all details</a>
+          <a class="btn btn-warning m-3" href="{{route('admin.posts.edit', $post->slug)}}">Edit post</a>
         <form action="{{route('admin.posts.destroy', $post->id)}}" method="POST">
             @csrf
             @method('DELETE')
