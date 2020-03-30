@@ -1,6 +1,13 @@
 @extends('layouts.layout')
+
+
 @section('header')
+@if (session('delete'))
+    <div class="alert alert-danger">
+      Post Deleted: {{session('delete')->title}}
+    </div>
     <h1 class="text-center">All posts</h1>
+  @endif  
 @endsection
 @section('main-content')
   @foreach ($posts as $post)
@@ -12,7 +19,7 @@
           <a href="#" class="btn btn-primary m-3">Add Comment</a>
           <a class="btn btn-success m-3" href="">View all details</a>
           <a class="btn btn-warning m-3" href="">Edit post</a>
-          <form action="" method="POST">
+        <form action="{{route('admin.posts.destroy', $post->id)}}" method="POST">
             @csrf
             @method('DELETE')
             <button class="btn btn-danger m-3" type="submit">Delete post</button> 
