@@ -5,7 +5,6 @@ use App\Post;
 use App\User;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
-
 class PostsTableSeeder extends Seeder
 {
     /**
@@ -22,6 +21,7 @@ class PostsTableSeeder extends Seeder
             $newPost->body = $faker->text(255);
             $newPost->slug = Str::finish(Str::slug($newPost->title), rand(1, 1000000));
             $newPost->user_id = $idUtente->id;
+
             $newPost->save();
         }
     }
