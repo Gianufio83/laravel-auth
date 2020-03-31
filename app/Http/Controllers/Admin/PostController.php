@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Post;
+use App\Tag;
+use App\Image;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +44,14 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create');
+        $tags = Tag::all();
+        $images = Image::all();
+
+        $data = [
+            'tags' => $tags,
+            'images' => $images
+        ];
+        return view('admin.posts.create', $data);
     }
 
     /**
@@ -64,6 +73,16 @@ class PostController extends Controller
         $saved = $newPost->save();
         if (!$saved) {
             return redirect()->back();
+        }
+
+        $tags = $data['tags'];
+        if (!empty($tags)) {
+            $newPost->tags()->attach($tags);
+        }
+
+        $images = $data['images'];
+        if (!empty($images)) {
+            $newPost->images()->attach($images);
         }
         return redirect()->route('admin.posts.show', $newPost->slug);
     }
