@@ -14,10 +14,8 @@ use Carbon\Carbon;
 class PostController extends Controller
 {
     private $validateRules;
-
     public function __construct()
     {
-
         $this->validateRules = [
             'title' => 'required|string|max:255',
             'body' => 'required|string'
@@ -32,11 +30,9 @@ class PostController extends Controller
     {
         // questo è per vedere solamente i post dell'utente appena loggato
         // $posts = Post::where('user_id', Auth::id())->get();
-        
         $posts = Post::all();
         return view('admin.posts.index', compact('posts'));
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -46,14 +42,12 @@ class PostController extends Controller
     {
         $tags = Tag::all();
         $images = Image::all();
-
         $data = [
             'tags' => $tags,
             'images' => $images
         ];
         return view('admin.posts.create', $data);
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -74,19 +68,16 @@ class PostController extends Controller
         if (!$saved) {
             return redirect()->back();
         }
-
         $tags = $data['tags'];
         if (!empty($tags)) {
             $newPost->tags()->attach($tags);
         }
-
         $images = $data['images'];
         if (!empty($images)) {
             $newPost->images()->attach($images);
         }
         return redirect()->route('admin.posts.show', $newPost->slug);
     }
-
     /**
      * Display the specified resource.
      *
@@ -96,10 +87,8 @@ class PostController extends Controller
     public function show($slug)
     {
         $post = Post::where('slug', $slug)->first();
-
         return view('admin.posts.show', compact('post'));
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -109,10 +98,15 @@ class PostController extends Controller
     public function edit($slug)
     {
         $post = Post::where('slug', $slug)->first();
-
-        return view('admin.posts.edit', compact('post'));
+        $tags = Tag::all();
+        $images = Image::all();
+        $data = [
+            'tags' => $tags,
+            'post' => $post,
+            'images' => $images
+        ];
+        return view('admin.posts.edit', $data);
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -126,25 +120,29 @@ class PostController extends Controller
         if (empty($post)) {
             abort(404);
         }
-
         if ($post->user->id != $idUser) {
             abort(404);
         }
         $request->validate($this->validateRules);
         $data = $request->all();
-
         $post->title = $data['title'];
         $post->body = $data['body'];
         $post->slug = Str::finish(Str::slug($post->title), rand(1, 1000000));
         $post->updated_at = Carbon::now();
         $updated = $post->update();
-
         if (!$updated) {
             return redirect()->back();
         }
+        $tags = $data['tags'];
+        if (!empty($tags)) {
+            $post->tags()->sync($tags);
+        }
+        $images = $data['images'];
+        if (!empty($images)) {
+            $post->images()->sync($images);
+        }
         return redirect()->route('admin.posts.show', $post->slug);
     }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -157,6 +155,8 @@ class PostController extends Controller
             abort('404');
         }
         $id = $post->id;
+        $post->images()->detach();
+        $post->tags()->detach();
         $post->delete();
         $data = [
             'id' => $id,
