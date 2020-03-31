@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('header')
-  <h1 class="text-center">Update the Post</h1>  
+    <h1 class="text-center">Update this post</h1>
 @endsection
 @section('main-content')
   <div class="wrapper">
@@ -13,10 +13,9 @@
         <input class="form-control" type="text" name="title" value="{{$post->title}}">
         </div>
         <div class="form-group">
-          <label for="body">Content</label>
+          <label for="content">Content</label>
         <textarea class="form-control" name="body" id="body" cols="30" rows="10">{{$post->body}}</textarea>
         </div>
-        {{-- <input type="hidden" name="user_id" value="{{Auth::user()->name}}"> --}}
         <button class="btn btn-success" type="submit">Salva</button>
       </form>
     </div>
