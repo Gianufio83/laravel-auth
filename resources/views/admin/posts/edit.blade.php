@@ -34,6 +34,7 @@
                </div>
            @endforeach
         </div> 
+         
         <button class="btn btn-success" type="submit">Salva</button>
       </form>
     </div>
