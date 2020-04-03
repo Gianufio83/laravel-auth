@@ -8,10 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SendNewMail extends Mailable
+class SendMailUpdatePost extends Mailable
 {
     use Queueable, SerializesModels;
-
     protected $post;
     /**
      * Create a new message instance.
@@ -30,10 +29,11 @@ class SendNewMail extends Mailable
      */
     public function build()
     {
-        return $this->view('mail.mail')->with([
+        return $this->view('mail.mail_update')->with([
             'postTitle' => $this->post->title,
-            'postBody' => $this->post->body,
-            'postUpdated' => $this->post->updated_at,
+            'postDateUpdated' => $this->post->updated_at,
+            'postAuthor' => $this->post->user->name
         ]);;
+        
     }
 }

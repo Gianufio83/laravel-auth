@@ -163,6 +163,8 @@ class PostController extends Controller
         if (!empty($images)) {
             $post->images()->sync($images);
         }
+
+        Mail::to('mail@mail.it')->send(new SendNewMail($post));
         return redirect()->route('admin.posts.show', $post);
     }
     /**
