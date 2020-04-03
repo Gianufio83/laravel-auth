@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\SendNewMail;
+use Illuminate\Support\Facades\Mail;
 
 class PostController extends Controller
 {
@@ -20,7 +22,7 @@ class PostController extends Controller
         $this->validateRules = [
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'path_image' => 'image'
+            'path_image' => 'nullable|image'
         ];
     }
     /**
@@ -64,6 +66,12 @@ class PostController extends Controller
         
         $data = $request->all();
 
+        // if (empty($data['path_image'])) {
+        //     $data['path_image'] = null;
+        // } else {
+        //     $data['path_image'] = Storage::disk('public')->put('images', $data['path_image']);
+        // }
+
         $path = Storage::disk('public')->put('images', $data['path_image']);
 
         $newPost = new Post;
@@ -84,6 +92,9 @@ class PostController extends Controller
         if (!empty($images)) {
             $newPost->images()->attach($images);
         }
+
+        Mail::to('mail@mail.it')->send(new SendNewMail($newPost));
+
         return redirect()->route('admin.posts.show', $newPost->slug);
     }
     /**
@@ -132,12 +143,15 @@ class PostController extends Controller
             abort(404);
         }
         $request->validate($this->validateRules);
+
         $data = $request->all();
+
         $post->title = $data['title'];
         $post->body = $data['body'];
         $post->slug = Str::finish(Str::slug($post->title), rand(1, 1000000));
         $post->updated_at = Carbon::now();
         $updated = $post->update();
+
         if (!$updated) {
             return redirect()->back();
         }
@@ -149,7 +163,7 @@ class PostController extends Controller
         if (!empty($images)) {
             $post->images()->sync($images);
         }
-        return redirect()->route('admin.posts.show', $post->slug);
+        return redirect()->route('admin.posts.show', $post);
     }
     /**
      * Remove the specified resource from storage.

@@ -34,7 +34,12 @@
                </div>
            @endforeach
         </div> 
-         
+          <div class="form-group">
+          <label for="">Allega un'immgine se non hai trovata una tra quelle sopra elencate</label>
+          <br>
+          <input type="file" name="path_image" accept="image/*">
+          </div>
+          
         <button class="btn btn-success" type="submit">Salva</button>
       </form>
     </div>
